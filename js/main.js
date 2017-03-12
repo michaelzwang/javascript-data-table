@@ -107,6 +107,7 @@ function getColumn(){
   table_head.addEventListener('click', function(e) {
     var clicked_column = e.target.id;
     var column = document.getElementById(clicked_column);
+
     sortColumn(column);
   });
 }
@@ -129,8 +130,18 @@ function sortColumn(column){
   else {
     removeSort();
     column.classList.add('ascending');
+
     var i = column.cellIndex;
-    sortByCol(dataSet, i);
+
+    if (column.id == 'salary'){
+      stringToNum();
+      sortByCol(dataSet, i);
+      numToString();
+    }
+    else {
+      sortByCol(dataSet, i);
+    }
+
     addRows();
   }
 }
@@ -154,4 +165,16 @@ function removeSort(){
   if (descending.length > 0) {
     descending[0].classList.remove('descending');
   }
+}
+
+function stringToNum(){
+  dataSet.forEach(function(employee){
+    employee[5] = Number(employee[5].replace(/(^\$|,)/g,''));
+  });
+}
+
+function numToString(){
+  dataSet.forEach(function(employee){
+    employee[5] = '$' + employee[5].toLocaleString();
+  });
 }
