@@ -95,8 +95,12 @@ function loadTable(){
   var first_column = column_headers[0].title;
   sortByCol(data, first_column);
 
-  splitTable();
+  changeEvents();
+  addCheckBoxes();
+}
 
+function changeEvents(){
+  splitTable();
   getColumn();
   changePage();
 }
@@ -260,7 +264,7 @@ function addRowGroup(group, index){
 function changePage(){
   var links = document.getElementsByClassName('pag-links')[0].children;
 
-  for (var i = 0; i < links.length; i++ ){
+  for (var i = 0; i < links.length; i++){
     links[i].addEventListener('click', function(e) {
       e.preventDefault();
 
@@ -282,3 +286,46 @@ function changePage(){
 
 
 // ===== SHOW/HIDE COLUMNS ================================
+function addCheckBoxes(){
+  var div = document.getElementsByClassName('checkbox-container')[0];
+  column_headers.forEach(function(column){
+    div.innerHTML += '<span class="box">' + '<input type="checkbox" id="cbox-' + column.title + '" checked onchange="handleChange(this);">'
+    + '<label for="cbox-' + column.title + '">' + column.title + '</label>' + '</span>'
+  })
+}
+
+function handleChange(checkbox){
+  var box_label = getLabel(checkbox.id);
+
+  if (checkbox.checked == true){
+    column_headers.forEach(function(column){
+      if (column.title == box_label){
+        column.visible = true;
+      }
+    });
+  }
+  else {
+    column_headers.forEach(function(column){
+      if (column.title == box_label){
+        column.visible = false;
+      }
+    });
+  }
+
+  clearEntireTable();
+  createTableHead();
+  changeEvents();
+}
+
+function getLabel(id) {
+  var input = document.getElementById(id);
+  return input.nextSibling.innerHTML;
+}
+
+function clearEntireTable(){
+  var table = document.getElementById('table');
+  table.innerHTML = ''
+}
+
+
+// ====== SEARCH =============================================
