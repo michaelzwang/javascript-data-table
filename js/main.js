@@ -1,62 +1,3 @@
-// data set taken from https://datatables.net/examples/data_sources/js_array.html
-var dataSet = [
-    [ "Tiger Nixon", "System Architect", "Edinburgh", "5421", "2011/04/25", "$320,800" ],
-    [ "Garrett Winters", "Accountant", "Tokyo", "8422", "2011/07/25", "$170,750" ],
-    [ "Ashton Cox", "Junior Technical Author", "San Francisco", "1562", "2009/01/12", "$86,000" ],
-    [ "Cedric Kelly", "Senior Javascript Developer", "Edinburgh", "6224", "2012/03/29", "$433,060" ],
-    [ "Airi Satou", "Accountant", "Tokyo", "5407", "2008/11/28", "$162,700" ],
-    [ "Brielle Williamson", "Integration Specialist", "New York", "4804", "2012/12/02", "$372,000" ],
-    [ "Herrod Chandler", "Sales Assistant", "San Francisco", "9608", "2012/08/06", "$137,500" ],
-    [ "Rhona Davidson", "Integration Specialist", "Tokyo", "6200", "2010/10/14", "$327,900" ],
-    [ "Colleen Hurst", "Javascript Developer", "San Francisco", "2360", "2009/09/15", "$205,500" ],
-    [ "Sonya Frost", "Software Engineer", "Edinburgh", "1667", "2008/12/13", "$103,600" ],
-    [ "Jena Gaines", "Office Manager", "London", "3814", "2008/12/19", "$90,560" ],
-    [ "Quinn Flynn", "Support Lead", "Edinburgh", "9497", "2013/03/03", "$342,000" ],
-    [ "Charde Marshall", "Regional Director", "San Francisco", "6741", "2008/10/16", "$470,600" ],
-    [ "Haley Kennedy", "Senior Marketing Designer", "London", "3597", "2012/12/18", "$313,500" ],
-    [ "Tatyana Fitzpatrick", "Regional Director", "London", "1965", "2010/03/17", "$385,750" ],
-    [ "Michael Silva", "Marketing Designer", "London", "1581", "2012/11/27", "$198,500" ],
-    [ "Paul Byrd", "Chief Financial Officer (CFO)", "New York", "3059", "2010/06/09", "$725,000" ],
-    [ "Gloria Little", "Systems Administrator", "New York", "1721", "2009/04/10", "$237,500" ],
-    [ "Bradley Greer", "Software Engineer", "London", "2558", "2012/10/13", "$132,000" ],
-    [ "Dai Rios", "Personnel Lead", "Edinburgh", "2290", "2012/09/26", "$217,500" ],
-    [ "Jenette Caldwell", "Development Lead", "New York", "1937", "2011/09/03", "$345,000" ],
-    [ "Yuri Berry", "Chief Marketing Officer (CMO)", "New York", "6154", "2009/06/25", "$675,000" ],
-    [ "Caesar Vance", "Pre-Sales Support", "New York", "8330", "2011/12/12", "$106,450" ],
-    [ "Doris Wilder", "Sales Assistant", "Sidney", "3023", "2010/09/20", "$85,600" ],
-    [ "Angelica Ramos", "Chief Executive Officer (CEO)", "London", "5797", "2009/10/09", "$1,200,000" ],
-    [ "Gavin Joyce", "Developer", "Edinburgh", "8822", "2010/12/22", "$92,575" ],
-    [ "Jennifer Chang", "Regional Director", "Singapore", "9239", "2010/11/14", "$357,650" ],
-    [ "Brenden Wagner", "Software Engineer", "San Francisco", "1314", "2011/06/07", "$206,850" ],
-    [ "Fiona Green", "Chief Operating Officer (COO)", "San Francisco", "2947", "2010/03/11", "$850,000" ],
-    [ "Shou Itou", "Regional Marketing", "Tokyo", "8899", "2011/08/14", "$163,000" ],
-    [ "Michelle House", "Integration Specialist", "Sidney", "2769", "2011/06/02", "$95,400" ],
-    [ "Suki Burks", "Developer", "London", "6832", "2009/10/22", "$114,500" ],
-    [ "Prescott Bartlett", "Technical Author", "London", "3606", "2011/05/07", "$145,000" ],
-    [ "Gavin Cortez", "Team Leader", "San Francisco", "2860", "2008/10/26", "$235,500" ],
-    [ "Martena Mccray", "Post-Sales support", "Edinburgh", "8240", "2011/03/09", "$324,050" ],
-    [ "Unity Butler", "Marketing Designer", "San Francisco", "5384", "2009/12/09", "$85,675" ]
-];
-
-// change arrays to objects
-function convertDataToObjects(){
-  var dataObjects = []
-  dataSet.forEach(function(array){
-    var employee = new Object();
-    employee.Name = array[0];
-    employee.Position = array[1];
-    employee.Office = array[2];
-    employee.Extn = array[3];
-    employee.StartDate = array[4];
-    employee.Salary = array[5];
-
-    dataObjects.push(employee);
-  });
-  return dataObjects;
-}
-
-// usable data variable
-var data = convertDataToObjects();
 
 // call this function when page loads
 function onLoadBody(){
@@ -73,6 +14,7 @@ class ColumnHeader {
 
 var column_headers = [];
 
+// creates column header objects with properties and groups them in an array
 function createColumnHeaders(){
   var properties = Object.getOwnPropertyNames(data[0]);
   properties.forEach(function(property){
@@ -83,20 +25,18 @@ function createColumnHeaders(){
 
 
 function loadTable(){
-// exit out if no data
   if (data.length == 0){
-    return;
+    return;                                   // exit out if no data
   }
 
   createColumnHeaders();
   createTableHead();
 
-// default to sort table by first column
-  var first_column = column_headers[0].title;
+  var first_column = column_headers[0].title; // default to sort table by first column
   sortByCol(data, first_column);
 
   splitTable();
-  getColumn();
+  onColumnHeadClick();
   changePage();
 
   addCheckBoxes();
@@ -107,8 +47,7 @@ function createTableHead(){
   var header = table.createTHead();
   var row = header.insertRow(0);
 
-// determine which columns to add
-  column_headers.forEach(function(column){
+  column_headers.forEach(function(column){  // determine which column headers to add
     if (column.visible == true){
       var cell = row.insertCell();
       cell.outerHTML = "<th id=" + column.title + ">" + column.title + "</th>";
@@ -116,7 +55,8 @@ function createTableHead(){
   });
 }
 
-function removeRows(){
+// deletes all rows of table
+function removeTableRows(){
   var table = document.getElementById('table');
   var all_tbody = table.getElementsByTagName("tbody");
 
@@ -127,21 +67,21 @@ function removeRows(){
 }
 
 // ====== SORTING ==================================
-
-function getColumn(){
+// determines which column head is clicked and needs to be sorted
+function onColumnHeadClick(){
   var table_head = document.getElementsByTagName("thead")[0];
   table_head.addEventListener('click', function(e) {
     var clicked_column = e.target.id;
     var column = document.getElementById(clicked_column);
 
-    sortColumn(column);
+    sortTableByColumn(column);
     changePage();
   });
 }
 
-function sortColumn(column){
-  removeRows();
-
+function sortTableByColumn(column){
+  removeTableRows();
+  // if clicked column is already sorted by this column, reverse table
   if (column.classList.contains('ascending')) {
     data.reverse();
     splitTable();
@@ -154,8 +94,9 @@ function sortColumn(column){
     column.classList.remove('descending');
     column.classList.add('ascending');
   }
+  // if not sorted, sort by clicked column
   else {
-    removeSort();
+    removeSortColor();
     column.classList.add('ascending');
     var property = column.id;
 
@@ -170,6 +111,7 @@ function sortColumn(column){
   }
 }
 
+// sorts array by object property (in this case by the column property clicked)
 function sortByCol(arr, property){
     arr.sort(sortFunction)
     function sortFunction(a, b) {
@@ -179,8 +121,8 @@ function sortByCol(arr, property){
     }
 }
 
-// determines color of column header
-function removeSort(){
+// removes all ascending and descending classes from table
+function removeSortColor(){
   var ascending = document.getElementsByClassName('ascending');
   if (ascending.length > 0) {
     ascending[0].classList.remove('ascending');
@@ -192,7 +134,7 @@ function removeSort(){
   }
 }
 
-// sort salary
+// sort salary correctly
 function sortSalary(property){
   currencyToNum(property);
   sortByCol(data, property);
@@ -213,7 +155,7 @@ function numToCurrency(property){
 
 
 // ===== PAGINATION ======================================
-
+// separates table into groups for pagination
 function splitTable(){
   var shortArrays = [], i, len;
 
@@ -222,14 +164,16 @@ function splitTable(){
   }
 
   var num_pages = shortArrays.length;
-  displayPage(shortArrays, num_pages)
+  displayTableRows(shortArrays, num_pages)
 }
 
-function displayPage(array, length){
+// displays table rows with pagination links
+function displayTableRows(array, length){
   array.forEach(function(group, index){
-    addRowGroup(group, index);
+    addRowGroupToTable(group, index);
   });
 
+  // add proper number of pagination links to html
   var i = 1
   var pag_links = '<a href="#" id="current-link">1</a>';
   while (i < length) {
@@ -238,6 +182,7 @@ function displayPage(array, length){
   }
   document.getElementsByClassName('pag-links')[0].innerHTML = pag_links;
 
+  // default to show first page
   var first_page = document.getElementById('page-1');
   if (first_page) {
     first_page.classList.toggle('hide');
@@ -245,7 +190,8 @@ function displayPage(array, length){
   }
 }
 
-function addRowGroup(group, index){
+// add data to table by pagination group
+function addRowGroupToTable(group, index){
   var table = document.getElementById('table');
   var body = table.appendChild(document.createElement('tbody'));
   body.classList.add('hide');
@@ -255,6 +201,7 @@ function addRowGroup(group, index){
   group.forEach(function(obj){
     var row = body.insertRow(-1);
 
+    // only adds group if column header is visible/checked
     column_headers.forEach(function(column){
       if (column.visible == true){
         var cell = row.insertCell();
@@ -264,6 +211,7 @@ function addRowGroup(group, index){
   });
 }
 
+// displays group of rows associated with the page number
 function changePage(){
   var links = document.getElementsByClassName('pag-links')[0].children;
 
@@ -289,6 +237,7 @@ function changePage(){
 
 
 // ===== SHOW/HIDE COLUMNS ================================
+// adds checkboxes with correct labels to html
 function addCheckBoxes(){
   var div = document.getElementsByClassName('checkbox-container')[0];
   column_headers.forEach(function(column){
@@ -298,9 +247,11 @@ function addCheckBoxes(){
   })
 }
 
+// changes table when checkbox is clicked
 function handleChange(checkbox){
   var box_label = getLabel(checkbox.id);
 
+  // determines if column header is visible
   if (checkbox.checked == true){
     column_headers.forEach(function(column){
       if (column.title == box_label){
@@ -316,11 +267,12 @@ function handleChange(checkbox){
     });
   }
 
+  // create and display new table
   clearEntireTable();
   createTableHead();
 
   splitTable();
-  getColumn();
+  onColumnHeadClick();
   changePage();
   filterData();
 }
@@ -337,27 +289,31 @@ function clearEntireTable(){
 
 
 // ====== SEARCH =============================================
-
+// called when typing in search box
 function filterData(){
   var input, filter;
   input = document.getElementById("myInput");
-  filter = input.value.toUpperCase();
+  filter = input.value.toUpperCase();            // string typed in search box
 
   var filtered_data = [];
 
+  // check each object
   data.forEach(function(obj){
     var addObject = false;
 
     for (var i=0; i<column_headers.length; i++) {
       var column_head = column_headers[i];
 
+      // only search if column is visible/checked
       if(column_head.visible) {
+        // if nothing typed OR if string matches any table data
         if(filter==""  || obj[column_head.title].toUpperCase().indexOf(filter) > -1){
           addObject = true;
         }
       }
     }
 
+    // add data object to filtered data array
     if(addObject) {
       filtered_data.push(obj);
     }
@@ -368,14 +324,42 @@ function filterData(){
   createTableHead();
 
   var shortArrays = [], i, len;
-
+  // split filtered data 
   for (i = 0, len = filtered_data.length; i < len; i += 10) {
       shortArrays.push(filtered_data.slice(i, i + 10));
   }
 
   var num_pages = shortArrays.length;
-  displayPage(shortArrays, num_pages)
+  displayTableRows(shortArrays, num_pages)
 
-  getColumn();
+  onColumnHeadClick();
   changePage();
 }
+
+// ====== LOAD JSON ===========================================
+// example of loading JSON data, but using post-parsed data for testing purposes
+
+// function loadJSON(path, success, error){
+//     var xhr = new XMLHttpRequest();
+//     xhr.onreadystatechange = function(){
+//         if (xhr.readyState === XMLHttpRequest.DONE) {
+//             if (xhr.status === 200) {
+//                 if (success)
+//                     success(JSON.parse(xhr.responseText));
+//             } else {
+//                 if (error)
+//                     error(xhr);
+//             }
+//         }
+//     };
+//     xhr.open("GET", path, true);
+//     xhr.send();
+// }
+//
+// loadJSON('my-file.json',
+//    function(json) { var data = json },
+//    function(xhr) { console.error(xhr); }
+// );
+
+
+// ==== PERFORMANCE =================================================

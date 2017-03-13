@@ -63,6 +63,11 @@ th {
   border: 1px solid #ddd;
 }
 
+.pre-table{
+  width: 80%;
+  margin: 0 auto;
+}
+
 .pag-links {
   display: flex;
   justify-content: center;
