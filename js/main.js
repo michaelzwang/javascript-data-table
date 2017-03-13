@@ -159,15 +159,13 @@ function sortColumn(column){
     column.classList.add('ascending');
     var property = column.id;
 
-    // if (column.id == 'Salary'){
-    //   stringToNum();
-    //   sortByCol(data, property);
-    //   numToString();
-    // }
-    // else {
-    //   sortByCol(data, property);
-    // }
-    sortByCol(data, property);
+    if (data[0][property][0] == '$'){     // checks for $ at start of string
+      sortSalary(property);
+    }
+    else {
+      sortByCol(data, property);
+    }
+
     splitTable();
   }
 }
@@ -195,17 +193,23 @@ function removeSort(){
 }
 
 // sort salary
-// function stringToNum(){
-//   dataSet.forEach(function(employee){
-//     employee[5] = Number(employee[5].replace(/(^\$|,)/g,''));
-//   });
-// }
-//
-// function numToString(){
-//   dataSet.forEach(function(employee){
-//     employee[5] = '$' + employee[5].toLocaleString();
-//   });
-// }
+function sortSalary(property){
+  currencyToNum(property);
+  sortByCol(data, property);
+  numToCurrency(property);
+}
+
+function currencyToNum(property){
+  data.forEach(function(obj){
+    obj[property] = Number(obj[property].replace(/(^\$|,)/g,''));
+  });
+}
+
+function numToCurrency(property){
+  data.forEach(function(obj){
+    obj[property] = '$' + obj[property].toLocaleString();
+  });
+}
 
 
 // ===== PAGINATION ======================================
