@@ -38,8 +38,8 @@ function loadTable(){
   splitTable();
   onColumnHeadClick();
   changePage();
-
   addCheckBoxes();
+  viewingDescription();
 }
 
 function createTableHead(){
@@ -158,13 +158,14 @@ function numToCurrency(property){
 // separates table into groups for pagination
 function splitTable(){
   var shortArrays = [], i, len;
+  len = data.length;
 
-  for (i = 0, len = data.length; i < len; i += 10) {
+  for (i = 0; i < len; i += 10) {
       shortArrays.push(data.slice(i, i + 10));
   }
 
   var num_pages = shortArrays.length;
-  displayTableRows(shortArrays, num_pages)
+  displayTableRows(shortArrays, num_pages);
 }
 
 // displays table rows with pagination links
@@ -174,12 +175,13 @@ function displayTableRows(array, length){
   });
 
   // add proper number of pagination links to html
-  var i = 1
+  var i = 1;
   var pag_links = '<a href="#" id="current-link">1</a>';
   while (i < length) {
-    pag_links += '<a href="#">' + String(i+1) + '</a>'
+    pag_links += '<a href="#">' + String(i+1) + '</a>';
     i++;
   }
+
   document.getElementsByClassName('pag-links')[0].innerHTML = pag_links;
 
   // default to show first page
@@ -213,7 +215,8 @@ function addRowGroupToTable(group, index){
 
 // displays group of rows associated with the page number
 function changePage(){
-  var links = document.getElementsByClassName('pag-links')[0].children;
+  var page_links = document.getElementsByClassName('pag-links')[0];
+  var links = page_links.children;
 
   for (var i = 0; i < links.length; i++){
     links[i].addEventListener('click', function(e) {
@@ -231,10 +234,44 @@ function changePage(){
       var new_page = document.getElementById('page-' + page_num);
       new_page.classList.toggle('hide');
       new_page.classList.toggle('show');
+
+      viewingDescription()
+
     }, false);
   }
 }
 
+// creates description for number of items being viewed
+function viewingDescription(){
+  var viewing = document.getElementById('viewing');
+  var page_num = document.getElementById('current-link').innerHTML;
+  var group = document.getElementsByClassName('show')[0];
+  if (group){
+    var group_size = group.children.length;
+    var tbodies = document.getElementsByTagName('tbody');
+
+    var total = 0;
+    for (var i = 0; i < tbodies.length; i++){
+      total += tbodies[i].children.length;
+    }
+
+    if (group_size == 10){
+      var range_end = group_size * page_num;
+      var range = String(range_end - 9) + ' - ' + String(range_end);
+    }
+    else if (group_size == total ){
+      var range = String(total);
+    }
+    else {
+      var range = String(total - group_size) + ' - ' + String(total);
+    }
+    var phrase = 'Viewing ' + range + ' of ' + String(total) + ' items';
+    viewing.innerHTML = phrase;
+  }
+  else {
+    viewing.innerHTML = '';
+  }
+}
 
 // ===== SHOW/HIDE COLUMNS ================================
 // adds checkboxes with correct labels to html
@@ -275,6 +312,7 @@ function handleChange(checkbox){
   onColumnHeadClick();
   changePage();
   filterData();
+  viewingDescription();
 }
 
 function getLabel(id) {
@@ -324,16 +362,18 @@ function filterData(){
   createTableHead();
 
   var shortArrays = [], i, len;
-  // split filtered data 
-  for (i = 0, len = filtered_data.length; i < len; i += 10) {
+  len = filtered_data.length;
+  // split filtered data
+  for (i = 0; i < len; i += 10) {
       shortArrays.push(filtered_data.slice(i, i + 10));
   }
 
   var num_pages = shortArrays.length;
-  displayTableRows(shortArrays, num_pages)
+  displayTableRows(shortArrays, num_pages);
 
   onColumnHeadClick();
   changePage();
+  viewingDescription();
 }
 
 // ====== LOAD JSON ===========================================
@@ -363,3 +403,6 @@ function filterData(){
 
 
 // ==== PERFORMANCE =================================================
+
+
+// ==== FUTURE COMPONENTS =================================================
