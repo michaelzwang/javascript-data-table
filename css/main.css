@@ -34,6 +34,35 @@ th {
   background-color: #ffa64d;
 }
 
+.hide {
+  display: none;
+}
+
+.table-features-container {
+  width: 80%;
+  margin: 0 auto 20px auto;
+  display: flex;
+  justify-content: space-between;
+  flex-flow: row wrap;
+}
+
+.checkbox-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.checkbox-container span {
+  margin: 0 5px;
+}
+
+#myInput {
+  width: 200px;
+  font-size: 16px;
+  padding: 12px 20px 12px 20px;
+  border: 1px solid #ddd;
+}
+
 .pag-links {
   display: flex;
   justify-content: center;
@@ -52,30 +81,4 @@ th {
   background-color: #3399ff;
   color: white;
   border: 1px solid #3399ff;
-}
-
-.hide {
-  display: none;
-}
-
-.checkbox-container {
-  display: flex;
-  justify-content: center;
-  margin: 0 0 20px 0;
-}
-
-.checkbox-container span {
-  margin: 0 15px;
-}
-
-#myInput {
-  /*background-image: url('/css/searchicon.png');*/
-  /*background-position: 10px 10px;*/
-  /*background-repeat: no-repeat;*/
-  width: 30%;
-  display: block;
-  font-size: 16px;
-  padding: 12px 20px 12px 40px;
-  border: 1px solid #ddd;
-  margin: 0 auto 12px auto;
 }

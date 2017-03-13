@@ -239,8 +239,10 @@ function displayPage(array, length){
   document.getElementsByClassName('pag-links')[0].innerHTML = pag_links;
 
   var first_page = document.getElementById('page-1');
-  first_page.classList.toggle('hide');
-  first_page.classList.toggle('show');
+  if (first_page) {
+    first_page.classList.toggle('hide');
+    first_page.classList.toggle('show');
+  }
 }
 
 function addRowGroup(group, index){
