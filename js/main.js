@@ -1,3 +1,4 @@
+// data set taken from https://datatables.net/examples/data_sources/js_array.html
 var dataSet = [
     [ "Tiger Nixon", "System Architect", "Edinburgh", "5421", "2011/04/25", "$320,800" ],
     [ "Garrett Winters", "Accountant", "Tokyo", "8422", "2011/07/25", "$170,750" ],
@@ -37,13 +38,66 @@ var dataSet = [
     [ "Unity Butler", "Marketing Designer", "San Francisco", "5384", "2009/12/09", "$85,675" ]
 ];
 
+// change arrays to objects
+function convertDataToObjects(){
+  var dataObjects = []
+  dataSet.forEach(function(array){
+    var employee = new Object();
+    employee.Name = array[0];
+    employee.Position = array[1];
+    employee.Office = array[2];
+    employee.Extn = array[3];
+    employee.StartDate = array[4];
+    employee.Salary = array[5];
+
+    dataObjects.push(employee);
+  });
+  return dataObjects;
+}
+
+// usable data variable
+var data = convertDataToObjects();
+
+// call this function when page loads
+function onLoadBody(){
+  loadTable();
+}
+
+// define column header class
+class ColumnHeader {
+  constructor(title, visible){
+    this.title = title;
+    this.visible = visible;
+  }
+}
+
+var column_headers = [];
+
+function createColumnHeaders(){
+  var properties = Object.getOwnPropertyNames(data[0]);
+  properties.forEach(function(property){
+    var column_header = new ColumnHeader(property, true);
+    column_headers.push(column_header);
+  });
+}
+
+
 function loadTable(){
+// exit out if no data
+  if (data.length == 0){
+    return;
+  }
+
+  createColumnHeaders();
   createTableHead();
-  dataSet.sort(initialSortName);
+
+// default to sort table by first column
+  var first_column = column_headers[0].title;
+  sortByCol(data, first_column);
 
   splitTable();
-  getColumn();
 
+  getColumn();
   changePage();
 }
 
@@ -51,39 +105,15 @@ function createTableHead(){
   var table = document.getElementById("table");
   var header = table.createTHead();
   var row = header.insertRow(0);
-  var cell_0 = row.insertCell(0);
-  var cell_1 = row.insertCell(1);
-  var cell_2 = row.insertCell(2);
-  var cell_3 = row.insertCell(3);
-  var cell_4 = row.insertCell(4);
-  var cell_5 = row.insertCell(5);
-  cell_0.outerHTML = "<th id='name'>Name</th>";
-  cell_1.outerHTML = "<th id='position'>Position</th>";
-  cell_2.outerHTML = "<th id='office'>Office</th>";
-  cell_3.outerHTML = "<th id='extn'>Extn.</th>";
-  cell_4.outerHTML = "<th id='start'>Start Date</th>";
-  cell_5.outerHTML = "<th id='salary'>Salary</th>";
-}
 
-// function addRows(){
-//   var table = document.getElementById('table');
-//   var body = table.appendChild(document.createElement('tbody'));
-//   dataSet.forEach(function(employee){
-//     var row = body.insertRow(-1);
-//     var cell_0 = row.insertCell(0);
-//     var cell_1 = row.insertCell(1);
-//     var cell_2 = row.insertCell(2);
-//     var cell_3 = row.insertCell(3);
-//     var cell_4 = row.insertCell(4);
-//     var cell_5 = row.insertCell(5);
-//     cell_0.innerHTML = employee[0];
-//     cell_1.innerHTML = employee[1];
-//     cell_2.innerHTML = employee[2];
-//     cell_3.innerHTML = employee[3];
-//     cell_4.innerHTML = employee[4];
-//     cell_5.innerHTML = employee[5];
-//   })
-// }
+// determine which columns to add
+  column_headers.forEach(function(column){
+    if (column.visible == true){
+      var cell = row.insertCell();
+      cell.outerHTML = "<th id=" + column.title + ">" + column.title + "</th>";
+    }
+  });
+}
 
 function removeRows(){
   var table = document.getElementById('table');
@@ -96,18 +126,6 @@ function removeRows(){
 }
 
 // ====== SORTING ==================================
-
-function initialSortName(a, b){
-  var name = document.getElementById('name');
-  name.classList.add('ascending');
-
-  if (a[0] === b[0]) {
-    return 0;
-  }
-  else {
-    return (a[0] < b[0]) ? -1 : 1;
-  }
-}
 
 function getColumn(){
   var table_head = document.getElementsByTagName("thead")[0];
@@ -138,31 +156,31 @@ function sortColumn(column){
   else {
     removeSort();
     column.classList.add('ascending');
+    var property = column.id;
 
-    var i = column.cellIndex;
-
-    if (column.id == 'salary'){
-      stringToNum();
-      sortByCol(dataSet, i);
-      numToString();
-    }
-    else {
-      sortByCol(dataSet, i);
-    }
-
+    // if (column.id == 'Salary'){
+    //   stringToNum();
+    //   sortByCol(data, property);
+    //   numToString();
+    // }
+    // else {
+    //   sortByCol(data, property);
+    // }
+    sortByCol(data, property);
     splitTable();
   }
 }
 
-function sortByCol(arr, colIndex){
+function sortByCol(arr, property){
     arr.sort(sortFunction)
     function sortFunction(a, b) {
-        a = a[colIndex]
-        b = b[colIndex]
+        a = a[property]
+        b = b[property]
         return (a === b) ? 0 : (a < b) ? -1 : 1
     }
 }
 
+// determines color of column header
 function removeSort(){
   var ascending = document.getElementsByClassName('ascending');
   if (ascending.length > 0) {
@@ -175,17 +193,18 @@ function removeSort(){
   }
 }
 
-function stringToNum(){
-  dataSet.forEach(function(employee){
-    employee[5] = Number(employee[5].replace(/(^\$|,)/g,''));
-  });
-}
-
-function numToString(){
-  dataSet.forEach(function(employee){
-    employee[5] = '$' + employee[5].toLocaleString();
-  });
-}
+// sort salary
+// function stringToNum(){
+//   dataSet.forEach(function(employee){
+//     employee[5] = Number(employee[5].replace(/(^\$|,)/g,''));
+//   });
+// }
+//
+// function numToString(){
+//   dataSet.forEach(function(employee){
+//     employee[5] = '$' + employee[5].toLocaleString();
+//   });
+// }
 
 
 // ===== PAGINATION ======================================
@@ -193,8 +212,8 @@ function numToString(){
 function splitTable(){
   var shortArrays = [], i, len;
 
-  for (i = 0, len = dataSet.length; i < len; i += 10) {
-      shortArrays.push(dataSet.slice(i, i + 10));
+  for (i = 0, len = data.length; i < len; i += 10) {
+      shortArrays.push(data.slice(i, i + 10));
   }
 
   var num_pages = shortArrays.length;
@@ -225,21 +244,17 @@ function addRowGroup(group, index){
   body.classList.add('hide');
   body.id = 'page-' + String(index + 1);
 
-  group.forEach(function(employee){
+
+  group.forEach(function(obj){
     var row = body.insertRow(-1);
-    var cell_0 = row.insertCell(0);
-    var cell_1 = row.insertCell(1);
-    var cell_2 = row.insertCell(2);
-    var cell_3 = row.insertCell(3);
-    var cell_4 = row.insertCell(4);
-    var cell_5 = row.insertCell(5);
-    cell_0.innerHTML = employee[0];
-    cell_1.innerHTML = employee[1];
-    cell_2.innerHTML = employee[2];
-    cell_3.innerHTML = employee[3];
-    cell_4.innerHTML = employee[4];
-    cell_5.innerHTML = employee[5];
-  })
+
+    column_headers.forEach(function(column){
+      if (column.visible == true){
+        var cell = row.insertCell();
+        cell.innerHTML = obj[column.title];
+      }
+    });
+  });
 }
 
 function changePage(){
@@ -264,3 +279,6 @@ function changePage(){
     }, false);
   }
 }
+
+
+// ===== SHOW/HIDE COLUMNS ================================
