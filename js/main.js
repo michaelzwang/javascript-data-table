@@ -40,9 +40,11 @@ var dataSet = [
 function loadTable(){
   createTableHead();
   dataSet.sort(initialSortName);
-  addRows();
 
+  splitTable();
   getColumn();
+
+  changePage();
 }
 
 function createTableHead(){
@@ -63,32 +65,37 @@ function createTableHead(){
   cell_5.outerHTML = "<th id='salary'>Salary</th>";
 }
 
-function addRows(){
-  var table = document.getElementById('table');
-  var body = table.appendChild(document.createElement('tbody'));
-  dataSet.forEach(function(employee){
-    var row = body.insertRow(-1);
-    var cell_0 = row.insertCell(0);
-    var cell_1 = row.insertCell(1);
-    var cell_2 = row.insertCell(2);
-    var cell_3 = row.insertCell(3);
-    var cell_4 = row.insertCell(4);
-    var cell_5 = row.insertCell(5);
-    cell_0.innerHTML = employee[0];
-    cell_1.innerHTML = employee[1];
-    cell_2.innerHTML = employee[2];
-    cell_3.innerHTML = employee[3];
-    cell_4.innerHTML = employee[4];
-    cell_5.innerHTML = employee[5];
-  })
-}
+// function addRows(){
+//   var table = document.getElementById('table');
+//   var body = table.appendChild(document.createElement('tbody'));
+//   dataSet.forEach(function(employee){
+//     var row = body.insertRow(-1);
+//     var cell_0 = row.insertCell(0);
+//     var cell_1 = row.insertCell(1);
+//     var cell_2 = row.insertCell(2);
+//     var cell_3 = row.insertCell(3);
+//     var cell_4 = row.insertCell(4);
+//     var cell_5 = row.insertCell(5);
+//     cell_0.innerHTML = employee[0];
+//     cell_1.innerHTML = employee[1];
+//     cell_2.innerHTML = employee[2];
+//     cell_3.innerHTML = employee[3];
+//     cell_4.innerHTML = employee[4];
+//     cell_5.innerHTML = employee[5];
+//   })
+// }
 
 function removeRows(){
   var table = document.getElementById('table');
-  while(table.rows.length > 1) {
-    table.deleteRow(1);
+  var all_tbody = table.getElementsByTagName("tbody");
+
+  var i = 0
+  while(i < all_tbody.length) {
+    table.removeChild(all_tbody[i])
   }
 }
+
+// ====== SORTING ==================================
 
 function initialSortName(a, b){
   var name = document.getElementById('name');
@@ -109,6 +116,7 @@ function getColumn(){
     var column = document.getElementById(clicked_column);
 
     sortColumn(column);
+    changePage();
   });
 }
 
@@ -117,13 +125,13 @@ function sortColumn(column){
 
   if (column.classList.contains('ascending')) {
     dataSet.reverse();
-    addRows();
+    splitTable();
     column.classList.remove('ascending');
     column.classList.add('descending');
   }
   else if (column.classList.contains('descending')){
     dataSet.reverse();
-    addRows();
+    splitTable();
     column.classList.remove('descending');
     column.classList.add('ascending');
   }
@@ -142,7 +150,7 @@ function sortColumn(column){
       sortByCol(dataSet, i);
     }
 
-    addRows();
+    splitTable();
   }
 }
 
@@ -177,4 +185,82 @@ function numToString(){
   dataSet.forEach(function(employee){
     employee[5] = '$' + employee[5].toLocaleString();
   });
+}
+
+
+// ===== PAGINATION ======================================
+
+function splitTable(){
+  var shortArrays = [], i, len;
+
+  for (i = 0, len = dataSet.length; i < len; i += 10) {
+      shortArrays.push(dataSet.slice(i, i + 10));
+  }
+
+  var num_pages = shortArrays.length;
+  displayPage(shortArrays, num_pages)
+}
+
+function displayPage(array, length){
+  array.forEach(function(group, index){
+    addRowGroup(group, index);
+  });
+
+  var i = 1
+  var pag_links = '<a href="#" id="current-link">1</a>';
+  while (i < length) {
+    pag_links += '<a href="#">' + String(i+1) + '</a>'
+    i++;
+  }
+  document.getElementsByClassName('pag-links')[0].innerHTML = pag_links;
+
+  var first_page = document.getElementById('page-1');
+  first_page.classList.toggle('hide');
+  first_page.classList.toggle('show');
+}
+
+function addRowGroup(group, index){
+  var table = document.getElementById('table');
+  var body = table.appendChild(document.createElement('tbody'));
+  body.classList.add('hide');
+  body.id = 'page-' + String(index + 1);
+
+  group.forEach(function(employee){
+    var row = body.insertRow(-1);
+    var cell_0 = row.insertCell(0);
+    var cell_1 = row.insertCell(1);
+    var cell_2 = row.insertCell(2);
+    var cell_3 = row.insertCell(3);
+    var cell_4 = row.insertCell(4);
+    var cell_5 = row.insertCell(5);
+    cell_0.innerHTML = employee[0];
+    cell_1.innerHTML = employee[1];
+    cell_2.innerHTML = employee[2];
+    cell_3.innerHTML = employee[3];
+    cell_4.innerHTML = employee[4];
+    cell_5.innerHTML = employee[5];
+  })
+}
+
+function changePage(){
+  var links = document.getElementsByClassName('pag-links')[0].children;
+
+  for (var i = 0; i < links.length; i++ ){
+    links[i].addEventListener('click', function(e) {
+      e.preventDefault();
+
+      var current_page = document.getElementsByClassName('show')[0];
+      current_page.classList.toggle('hide');
+      current_page.classList.toggle('show');
+
+      var current_link = document.getElementById('current-link');
+      current_link.removeAttribute('id');
+
+      e.target.id = 'current-link';
+      var page_num = e.target.innerHTML;
+      var new_page = document.getElementById('page-' + page_num);
+      new_page.classList.toggle('hide');
+      new_page.classList.toggle('show');
+    }, false);
+  }
 }
