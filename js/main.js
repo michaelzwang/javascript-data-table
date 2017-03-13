@@ -95,14 +95,11 @@ function loadTable(){
   var first_column = column_headers[0].title;
   sortByCol(data, first_column);
 
-  changeEvents();
-  addCheckBoxes();
-}
-
-function changeEvents(){
   splitTable();
   getColumn();
   changePage();
+
+  addCheckBoxes();
 }
 
 function createTableHead(){
@@ -146,13 +143,13 @@ function sortColumn(column){
   removeRows();
 
   if (column.classList.contains('ascending')) {
-    dataSet.reverse();
+    data.reverse();
     splitTable();
     column.classList.remove('ascending');
     column.classList.add('descending');
   }
   else if (column.classList.contains('descending')){
-    dataSet.reverse();
+    data.reverse();
     splitTable();
     column.classList.remove('descending');
     column.classList.add('ascending');
@@ -289,8 +286,9 @@ function changePage(){
 function addCheckBoxes(){
   var div = document.getElementsByClassName('checkbox-container')[0];
   column_headers.forEach(function(column){
-    div.innerHTML += '<span class="box">' + '<input type="checkbox" id="cbox-' + column.title + '" checked onchange="handleChange(this);">'
-    + '<label for="cbox-' + column.title + '">' + column.title + '</label>' + '</span>'
+    div.innerHTML += '<span class="box">' + '<input type="checkbox" id="cbox-' +
+    column.title + '" checked onchange="handleChange(this);">' + '<label for="cbox-' +
+    column.title + '">' + column.title + '</label>' + '</span>'
   })
 }
 
@@ -314,7 +312,11 @@ function handleChange(checkbox){
 
   clearEntireTable();
   createTableHead();
-  changeEvents();
+
+  splitTable();
+  getColumn();
+  changePage();
+  filterData();
 }
 
 function getLabel(id) {
@@ -329,3 +331,45 @@ function clearEntireTable(){
 
 
 // ====== SEARCH =============================================
+
+function filterData(){
+  var input, filter;
+  input = document.getElementById("myInput");
+  filter = input.value.toUpperCase();
+
+  var filtered_data = [];
+
+  data.forEach(function(obj){
+    var addObject = false;
+
+    for (var i=0; i<column_headers.length; i++) {
+      var column_head = column_headers[i];
+
+      if(column_head.visible) {
+        if(filter==""  || obj[column_head.title].toUpperCase().indexOf(filter) > -1){
+          addObject = true;
+        }
+      }
+    }
+
+    if(addObject) {
+      filtered_data.push(obj);
+    }
+
+  });
+
+  clearEntireTable();
+  createTableHead();
+
+  var shortArrays = [], i, len;
+
+  for (i = 0, len = filtered_data.length; i < len; i += 10) {
+      shortArrays.push(filtered_data.slice(i, i + 10));
+  }
+
+  var num_pages = shortArrays.length;
+  displayPage(shortArrays, num_pages)
+
+  getColumn();
+  changePage();
+}
